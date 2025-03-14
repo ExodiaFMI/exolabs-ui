@@ -54,3 +54,4 @@ export default tseslint.config({
 ```
 # exolabs-ui
 # exolabs-ui
+# exolabs-ui
