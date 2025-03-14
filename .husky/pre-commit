@@ -1,0 +1,6 @@
+echo "\033[1;33mRunning pre-commit hook ...\033[0m"
+echo "Formatting staged files ..."
+
+npx lint-staged
+
+echo "\033[0;32mPre-commit hook finished successfully\033[0m"
