@@ -16,9 +16,6 @@ const StudyTheoryModePage: React.FC = () => {
   const subtopicsClient = useApiClient(SubtopicsApi);
 
   const [currentTopicIndex, setCurrentTopicIndex] = useState(0);
-  const onTopicChange = (index: number) => {
-    setCurrentTopicIndex(index);
-  };
 
   const { data: topics = [] } = useSuspenseQuery<TopicResponseDto[]>({
     queryKey: ['topics', courseId],
@@ -43,6 +40,14 @@ const StudyTheoryModePage: React.FC = () => {
 
   const topicWithSubtopics = selectedTopic ? { ...selectedTopic, subtopics } : null;
 
+  const onSubtopicsEnd = () => {
+    setCurrentTopicIndex(curr => (curr !== topics.length - 1 ? curr + 1 : curr));
+  };
+
+  const onSubtopicsStart = () => {
+    setCurrentTopicIndex(curr => (curr !== 0 ? curr - 1 : curr));
+  };
+
   return (
     <section className="flex justify-between gap-5 px-15">
       <aside className="bg-gray-200 w-120 h- text-secondary p-4 rounded-lg sticky top-4">
@@ -66,6 +71,8 @@ const StudyTheoryModePage: React.FC = () => {
         topic={topicWithSubtopics}
         interactiveSrc={interactiveSrc}
         isInteractive={false}
+        onSubtopicsNextEnd={() => onSubtopicsEnd()}
+        onSubtopicsPrevStart={() => onSubtopicsStart()}
       />
     </section>
   );

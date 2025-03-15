@@ -1,29 +1,26 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  HiThumbDown,
-  HiThumbUp,
-  HiArrowLeft,
-  HiArrowRight,
-  HiQuestionMarkCircle,
-} from 'react-icons/hi';
-import { Button } from '../../lib/catalyst/button';
-import Interactive from '../Interactive/Interactive';
-import ChatBox from '../ChatBox/ChatBox';
-import { TopicResponseDto, SubtopicResponseDto } from '../../codegen';
-import { useParams } from 'react-router';
+import React, { useEffect, useRef, useState } from 'react';
+import { HiArrowLeft, HiArrowRight, HiQuestionMarkCircle } from 'react-icons/hi';
 import ReactMarkdown from 'react-markdown';
+import { SubtopicResponseDto, TopicResponseDto } from '../../codegen';
+import { Button } from '../../lib/catalyst/button';
 import Progress from '../../shared/components/Progress';
+import ChatBox from '../ChatBox/ChatBox';
+import Interactive from '../Interactive/Interactive';
 
 interface SubtopicOverviewProps {
   topic: TopicResponseDto & { subtopics: SubtopicResponseDto[] };
   isInteractive: boolean;
   interactiveSrc: string;
+  onSubtopicsNextEnd?: () => void;
+  onSubtopicsPrevStart?: () => void;
 }
 
 const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
   topic,
   interactiveSrc,
   isInteractive,
+  onSubtopicsNextEnd,
+  onSubtopicsPrevStart,
 }) => {
   const [currentSubtopicIndex, setCurrentSubtopicIndex] = useState(0);
   const [showChatBox, setShowChatBox] = useState(false);
@@ -36,18 +33,22 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
   const topicHeadingRef = useRef<HTMLDivElement>(null);
 
   const handleNext = () => {
+    setShowChatBox(false);
+    scrollToTop();
     if (currentSubtopicIndex < topic.subtopics.length - 1) {
       setCurrentSubtopicIndex(currentSubtopicIndex + 1);
-      setShowChatBox(false); // Hide ChatBox when moving to the next subtopic
-      scrollToTop();
+    } else {
+      onSubtopicsNextEnd?.();
     }
   };
 
   const handlePrevious = () => {
+    setShowChatBox(false);
+    scrollToTop();
     if (currentSubtopicIndex > 0) {
       setCurrentSubtopicIndex(currentSubtopicIndex - 1);
-      setShowChatBox(false); // Hide ChatBox when moving to the previous subtopic
-      scrollToTop();
+    } else {
+      onSubtopicsPrevStart?.();
     }
   };
 
@@ -109,10 +110,12 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
           <div className="flex justify-end mb-4 space-x-4">
             <Button
               onClick={handleDidntUnderstand}
-              className="text-white py-2 px-6 rounded-lg">
+              className="cursor-pointer text-white py-2 px-6 rounded-lg">
               <HiQuestionMarkCircle className="my-auto text-lg" /> Didn't Understand
             </Button>
-            <Button onClick={handleNext} className="text-white py-2 px-6 rounded-lg">
+            <Button
+              onClick={handleNext}
+              className="cursor-pointer text-white py-2 px-6 rounded-lg">
               Ok, next <HiArrowRight className="my-auto" />
             </Button>
           </div>
@@ -121,7 +124,9 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
               {currentSubtopicIndex + 1} / {topic.subtopics.length}
             </div>
           )}
-          <Button className="text-white py-2 px-4 rounded-lg mt-4">Generate Quiz</Button>
+          <Button className="cursor-pointer text-white py-2 px-4 rounded-lg mt-4">
+            Generate Quiz
+          </Button>
           {showChatBox && (
             <div ref={chatBoxRef}>
               <ChatBox />
