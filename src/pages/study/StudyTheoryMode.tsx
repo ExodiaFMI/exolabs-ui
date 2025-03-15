@@ -1,13 +1,13 @@
-import React from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
 import { useParams } from 'react-router';
-import StudyTheoryMode from '../../components/StudyMode/StudyTheoryMode';
 import {
-  TopicResponseDto,
-  TopicsApi,
   SubtopicResponseDto,
   SubtopicsApi,
+  TopicResponseDto,
+  TopicsApi,
 } from '../../codegen';
+import SubtopicOverview from '../../components/StudyMode/SubtopicOverview';
 import { useApiClient } from '../../hooks/useApi';
 
 const StudyTheoryModePage: React.FC = () => {
@@ -15,43 +15,59 @@ const StudyTheoryModePage: React.FC = () => {
   const topicsClient = useApiClient(TopicsApi);
   const subtopicsClient = useApiClient(SubtopicsApi);
 
-  const { data: topics } = useSuspenseQuery<TopicResponseDto[]>({
+  const [currentTopicIndex, setCurrentTopicIndex] = useState(0);
+  const onTopicChange = (index: number) => {
+    setCurrentTopicIndex(index);
+  };
+
+  const { data: topics = [] } = useSuspenseQuery<TopicResponseDto[]>({
     queryKey: ['topics', courseId],
     queryFn: () =>
       topicsClient.topicControllerGetTopicsByCourse({ courseId: Number(courseId) }),
   });
 
-  const topic = topics?.[0]; // Assuming the first topic for simplicity
+  const selectedTopic = topics[currentTopicIndex];
 
-  const { data: subtopics } = useSuspenseQuery<SubtopicResponseDto[]>({
-    queryKey: ['subtopics', topic?.id],
+  const { data: subtopics = [] } = useSuspenseQuery<SubtopicResponseDto[]>({
+    queryKey: ['subtopics', selectedTopic?.id],
     queryFn: () =>
       subtopicsClient.subtopicControllerGetSubtopicsByTopicAndCourse({
         courseId: Number(courseId),
-        topicId: topic?.id ?? 0,
+        topicId: selectedTopic?.id ?? 0,
       }),
-    enabled: !!topic,
+    enabled: !!selectedTopic,
   });
 
-  const isInteractive = true;
   const interactiveSrc =
     'https://human.biodigital.com/view?id=production/maleAdult/nerves_of_pharynx_guided&lang=en';
 
-  if (!topic || !subtopics) {
-    return <div>Loading...</div>;
-  }
-
-  const topicWithSubtopics: TopicResponseDto & { subtopics: SubtopicResponseDto[] } = {
-    ...topic,
-    subtopics: subtopics as SubtopicResponseDto[],
-  };
+  const topicWithSubtopics = selectedTopic ? { ...selectedTopic, subtopics } : null;
 
   return (
-    <StudyTheoryMode
-      topic={topicWithSubtopics}
-      interactiveSrc={interactiveSrc}
-      isInteractive
-    />
+    <section className="flex justify-between gap-5 px-15">
+      <aside className="bg-gray-200 w-120 h- text-secondary p-4 rounded-lg sticky top-4">
+        <h2 className="text-xl font-semibold mb-2">Topics</h2>
+        <ul>
+          {topics.map((topic, idx) => (
+            <li
+              onClick={() => setCurrentTopicIndex(idx)}
+              key={topic.id}
+              className={`mb-2 cursor-pointer ${
+                topics[currentTopicIndex].id === topic.id
+                  ? 'border-b-3 border-secondary'
+                  : ''
+              }`}>
+              {topic.name}
+            </li>
+          ))}
+        </ul>
+      </aside>
+      <SubtopicOverview
+        topic={topicWithSubtopics}
+        interactiveSrc={interactiveSrc}
+        isInteractive={false}
+      />
+    </section>
   );
 };
 

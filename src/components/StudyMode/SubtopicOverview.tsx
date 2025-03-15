@@ -12,20 +12,26 @@ import ChatBox from '../ChatBox/ChatBox';
 import { TopicResponseDto, SubtopicResponseDto } from '../../codegen';
 import { useParams } from 'react-router';
 import ReactMarkdown from 'react-markdown';
+import Progress from '../../shared/components/Progress';
 
-interface StudyTheoryModeProps {
+interface SubtopicOverviewProps {
   topic: TopicResponseDto & { subtopics: SubtopicResponseDto[] };
   isInteractive: boolean;
   interactiveSrc: string;
 }
 
-const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
+const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
   topic,
   interactiveSrc,
   isInteractive,
 }) => {
   const [currentSubtopicIndex, setCurrentSubtopicIndex] = useState(0);
   const [showChatBox, setShowChatBox] = useState(false);
+
+  useEffect(() => {
+    setCurrentSubtopicIndex(0);
+  }, [topic]);
+
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const topicHeadingRef = useRef<HTMLDivElement>(null);
 
@@ -62,41 +68,26 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
     }
   }, [showChatBox]);
 
-  const handleReset = () => {
-    setCurrentSubtopicIndex(0);
-  };
-
   return (
     <div className="container mx-auto p-4">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <aside className="bg-gray-200 text-secondary p-4 rounded-lg sticky top-4">
-          <h2 className="text-xl font-semibold mb-2">Sources</h2>
-          <p className="text-base">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio.
-            Praesent libero. Sed cursus ante dapibus diam.
-          </p>
-        </aside>
         <main className="col-span-3 p-4 text-black">
           <div className="mb-4 sticky top-0 bg-light p-4 z-1000">
             <div className="flex justify-between items-center mb-2">
               <span>
                 {currentSubtopicIndex > 0
-                  ? topic.subtopics[currentSubtopicIndex - 1].name
+                  ? topic.subtopics[currentSubtopicIndex - 1]?.name
                   : 'Start'}
               </span>
               <span>
                 {currentSubtopicIndex < topic.subtopics.length - 1
-                  ? topic.subtopics[currentSubtopicIndex + 1].name
+                  ? topic.subtopics[currentSubtopicIndex + 1]?.name
                   : 'End'}
               </span>
             </div>
-            <div className="relative w-full h-2 bg-gray-300 rounded">
-              <div
-                className="absolute top-0 h-2 bg-secondary rounded"
-                style={{
-                  width: `${((currentSubtopicIndex + 1) / topic.subtopics.length) * 100}%`,
-                }}></div>
-            </div>
+            <Progress
+              progress={((currentSubtopicIndex + 1) / topic.subtopics.length) * 100}
+            />
           </div>
           <Button
             onClick={handlePrevious}
@@ -109,9 +100,9 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
           <section className="bg-gray-100 p-4 rounded-lg mb-4">
             <div className="mb-4">
               <h3 className="text-xl font-semibold">
-                {topic.subtopics[currentSubtopicIndex].name}
+                {topic.subtopics[currentSubtopicIndex]?.name}
               </h3>
-              <ReactMarkdown>{topic.subtopics[currentSubtopicIndex].text}</ReactMarkdown>
+              <ReactMarkdown>{topic.subtopics[currentSubtopicIndex]?.text}</ReactMarkdown>
             </div>
           </section>
           {isInteractive && <Interactive src={interactiveSrc} />}
@@ -125,9 +116,11 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
               Ok, next <HiArrowRight className="my-auto" />
             </Button>
           </div>
-          <div className="text-center">
-            {currentSubtopicIndex + 1} / {topic.subtopics.length}
-          </div>
+          {topic.subtopics.length > 0 && (
+            <div className="text-center">
+              {currentSubtopicIndex + 1} / {topic.subtopics.length}
+            </div>
+          )}
           <Button className="text-white py-2 px-4 rounded-lg mt-4">Generate Quiz</Button>
           {showChatBox && (
             <div ref={chatBoxRef}>
@@ -140,4 +133,4 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
   );
 };
 
-export default StudyTheoryMode;
+export default SubtopicOverview;
