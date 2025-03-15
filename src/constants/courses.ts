@@ -1,7 +1,4 @@
-import { FC } from 'react';
-import CourseCard from '../components/user-dashboard/CourseCard';
-
-const cards = [
+export const COURSE_CARDS = [
   {
     id: 1,
     title: 'React Basics',
@@ -32,23 +29,4 @@ const cards = [
     message: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
     progress: 10,
   },
-];
-
-const UserDashboard: FC = () => {
-  return (
-    <section className="text-dark p-6">
-      <div className="grid grid-cols-3 gap-10">
-        {cards.map(card => (
-          <CourseCard
-            key={card.id}
-            progress={card.progress}
-            title={card.title}
-            description={card.message}
-          />
-        ))}
-      </div>
-    </section>
-  );
-};
-
-export default UserDashboard;
+] as const;

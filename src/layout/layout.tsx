@@ -8,18 +8,24 @@ import {
   DropdownItem,
 } from '../lib/catalyst/dropdown';
 import { HiOutlineLogin, HiChevronDoubleDown } from 'react-icons/hi';
+import { useNavigate } from 'react-router';
+import useJWT from '../hooks/useJWT';
+import BreadcrumbContext from './breadcrumbContext';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-const NavbarSettingsContext = createContext<{ setBreadcrumb: (val: string) => void }>({
-  setBreadcrumb: () => {},
-});
-
 const Layout: FC<LayoutProps> = ({ children }) => {
   const [breadcrumb, setBreadcrumb] = useState('Home');
-  const [user, _] = useState('Joe Doe');
+  const navigate = useNavigate();
+
+  const { user } = useJWT();
+
+  const onSignout = () => {
+    sessionStorage.removeItem('token');
+    navigate('/login');
+  };
 
   return (
     <>
@@ -31,14 +37,21 @@ const Layout: FC<LayoutProps> = ({ children }) => {
         <div className="flex items-center gap-3">
           <Dropdown>
             <DropdownButton color="dark/white" className="flex items-center">
-              <Avatar initials="JD" className="size-10" />
-              {user}
+              <Avatar
+                initials={user?.name.substring(0, 2).toUpperCase()}
+                className="size-10"
+              />
+              {user?.name}
               <HiChevronDoubleDown />
             </DropdownButton>
             <DropdownMenu>
-              <DropdownItem>Options</DropdownItem>
-              <DropdownItem>
-                <span className="flex gap-2">
+              <DropdownItem className="bg-primary hover:bg-secondary hover:text-red-500">
+                Options
+              </DropdownItem>
+              <DropdownItem className="bg-primary hover:bg-secondary">
+                <span
+                  className="flex gap-2 hover:text-red-500"
+                  onClick={() => onSignout()}>
                   Signout <HiOutlineLogin className="size-5" />
                 </span>
               </DropdownItem>
@@ -46,10 +59,10 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           </Dropdown>
         </div>
       </Navbar>
-      <main className="p-2 bg-gray-100">
-        <NavbarSettingsContext.Provider value={{ setBreadcrumb }}>
+      <main className="p-2">
+        <BreadcrumbContext.Provider value={{ setBreadcrumb }}>
           {children}
-        </NavbarSettingsContext.Provider>
+        </BreadcrumbContext.Provider>
       </main>
     </>
   );
