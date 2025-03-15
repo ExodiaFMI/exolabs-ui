@@ -1,11 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import SignupForm from '../components/auth/SignupForm';
+import useJWT from '../hooks/useJWT';
 
 const Signup = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const { isAuthenticated } = useJWT();
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSignup = async (name: string, email: string, password: string) => {
     setError('');
