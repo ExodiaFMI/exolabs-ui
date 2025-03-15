@@ -1,21 +1,17 @@
-import { FC, useContext, useEffect, useState } from 'react';
-import CourseCard from '../components/user-dashboard/CourseCard';
-import BreadcrumbContext from '../layout/breadcrumbContext';
-import { COURSE_CARDS } from '../constants/courses';
+import { FC, use, useEffect, useState } from 'react';
 import { HiOutlinePlusCircle } from 'react-icons/hi';
-import {
-  Dialog,
-  DialogActions,
-  DialogBody,
-  DialogDescription,
-  DialogTitle,
-} from '../lib/catalyst/dialog';
+import { CreateCourseDto } from '../codegen';
+import CourseCard from '../components/user-dashboard/CourseCard';
+import { COURSE_CARDS } from '../constants/courses';
+import BreadcrumbContext from '../layout/breadcrumbContext';
+import { Button } from '../lib/catalyst/button';
+import { Dialog, DialogActions, DialogBody, DialogTitle } from '../lib/catalyst/dialog';
 import { Field, Label } from '../lib/catalyst/fieldset';
 import { Input } from '../lib/catalyst/input';
-import { Button } from '../lib/catalyst/button';
+import { Listbox, ListboxLabel, ListboxOption } from '../lib/catalyst/listbox';
 
 const Dashboard: FC = () => {
-  const { setBreadcrumb } = useContext(BreadcrumbContext);
+  const { setBreadcrumb } = use(BreadcrumbContext);
   useEffect(() => {
     setBreadcrumb('Dashboard');
   }, [setBreadcrumb]);
@@ -41,20 +37,42 @@ const Dashboard: FC = () => {
         </section>
       </div>
       <Dialog open={isDialogOpen} onClose={setIsDialogOpen}>
-        <DialogTitle>Refund payment</DialogTitle>
-        <DialogDescription>
-          The refund will be reflected in the customer’s bank account 2 to 3 business days
-          after processing.
-        </DialogDescription>
+        <DialogTitle>Upload course material</DialogTitle>
         <DialogBody>
           <Field>
-            <Label>Amount</Label>
-            <Input name="amount" placeholder="$0.00" />
+            <Label htmlFor="status">Subject*</Label>
+            <Listbox name="status">
+              <ListboxOption value="1">
+                <ListboxLabel>Mathematics</ListboxLabel>
+              </ListboxOption>
+              <ListboxOption value="2">
+                <ListboxLabel>Geography</ListboxLabel>
+              </ListboxOption>
+              <ListboxOption value="3">
+                <ListboxLabel>Biology</ListboxLabel>
+              </ListboxOption>
+              <ListboxOption value="4">
+                <ListboxLabel>Chemistry</ListboxLabel>
+              </ListboxOption>
+            </Listbox>
+          </Field>
+          <Field className="mt-4">
+            <Label htmlFor="file">Course file*</Label>
+            <Input
+              accept=".pdf"
+              type="file"
+              name="file"
+              id="file"
+              placeholder="Enter course title"
+            />
           </Field>
         </DialogBody>
         <DialogActions>
           <Button plain onClick={() => setIsDialogOpen(false)}>
             Cancel
+          </Button>
+          <Button outline className="border-2" onClick={() => setIsDialogOpen(false)}>
+            Create
           </Button>
         </DialogActions>
       </Dialog>
