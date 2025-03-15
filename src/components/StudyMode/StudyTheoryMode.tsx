@@ -12,6 +12,10 @@ import ChatBox from '../ChatBox/ChatBox';
 import { TopicResponseDto, SubtopicResponseDto } from '../../codegen';
 import { useParams } from 'react-router';
 import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import Progress from '../../shared/components/Progress';
 
 interface StudyTheoryModeProps {
   topic: TopicResponseDto & { subtopics: SubtopicResponseDto[] };
@@ -26,8 +30,10 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
 }) => {
   const [currentSubtopicIndex, setCurrentSubtopicIndex] = useState(0);
   const [showChatBox, setShowChatBox] = useState(false);
+  const [showInteractive, setShowInteractive] = useState(false);
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const topicHeadingRef = useRef<HTMLDivElement>(null);
+  const interactiveRef = useRef<HTMLDivElement>(null);
 
   const handleNext = () => {
     if (currentSubtopicIndex < topic.subtopics.length - 1) {
@@ -47,6 +53,13 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
 
   const handleDidntUnderstand = () => {
     setShowChatBox(true);
+  };
+
+  const handleShowInteractive = () => {
+    setShowInteractive(true);
+    if (interactiveRef.current) {
+      interactiveRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const scrollToTop = () => {
@@ -78,31 +91,31 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
         </aside>
         <main className="col-span-3 p-4 text-black">
           <div className="mb-4 sticky top-0 bg-light p-4 z-1000">
-            <div className="flex justify-between items-center mb-2">
-              <span>
-                {currentSubtopicIndex > 0
-                  ? topic.subtopics[currentSubtopicIndex - 1].name
-                  : 'Start'}
-              </span>
-              <span>
-                {currentSubtopicIndex < topic.subtopics.length - 1
-                  ? topic.subtopics[currentSubtopicIndex + 1].name
-                  : 'End'}
-              </span>
-            </div>
-            <div className="relative w-full h-2 bg-gray-300 rounded">
-              <div
-                className="absolute top-0 h-2 bg-secondary rounded"
-                style={{
-                  width: `${((currentSubtopicIndex + 1) / topic.subtopics.length) * 100}%`,
-                }}></div>
+            <div className="flex justify-between mb-2 items-center">
+              {/* <Button
+                onClick={handlePrevious}
+                className="text-white py-2 px-6 rounded-lg flex items-center">
+                <HiArrowLeft /> Go back
+              </Button> */}
+              <div className="flex-grow">
+                <div className="flex justify-between items-center mb-2">
+                  <span>
+                    {currentSubtopicIndex > 0
+                      ? topic.subtopics[currentSubtopicIndex - 1].name
+                      : 'Start'}
+                  </span>
+                  <span>
+                    {currentSubtopicIndex < topic.subtopics.length - 1
+                      ? topic.subtopics[currentSubtopicIndex + 1].name
+                      : 'End'}
+                  </span>
+                </div>
+                <Progress
+                  progress={((currentSubtopicIndex + 1) / topic.subtopics.length) * 100}
+                />
+              </div>
             </div>
           </div>
-          <Button
-            onClick={handlePrevious}
-            className="text-white py-2 px-6 rounded-lg mb-4">
-            <HiArrowLeft />
-          </Button>
           <h1 ref={topicHeadingRef} className="text-3xl font-bold mb-4">
             Topic: {topic.name}
           </h1>
@@ -111,18 +124,33 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
               <h3 className="text-xl font-semibold">
                 {topic.subtopics[currentSubtopicIndex].name}
               </h3>
-              <ReactMarkdown>{topic.subtopics[currentSubtopicIndex].text}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                {topic.subtopics[currentSubtopicIndex].text}
+              </ReactMarkdown>
             </div>
           </section>
-          {isInteractive && <Interactive src={interactiveSrc} />}
+          {isInteractive && !showInteractive && (
+            <Button
+              onClick={handleShowInteractive}
+              className="text-white py-2 px-6 rounded-lg mb-4">
+              Show Interactive
+            </Button>
+          )}
+          {isInteractive && showInteractive && (
+            <div ref={interactiveRef}>
+              <Interactive src={interactiveSrc} />
+            </div>
+          )}
           <div className="flex justify-end mb-4 space-x-4">
             <Button
               onClick={handleDidntUnderstand}
               className="text-white py-2 px-6 rounded-lg">
               <HiQuestionMarkCircle className="my-auto text-lg" /> Didn't Understand
             </Button>
-            <Button onClick={handleNext} className="text-white py-2 px-6 rounded-lg">
-              Ok, next <HiArrowRight className="my-auto" />
+            <Button
+              onClick={handleNext}
+              className="text-white py-2 px-6 rounded-lg my-auto">
+              Ok, next <HiArrowRight className="max-width-100" />
             </Button>
           </div>
           <div className="text-center">
