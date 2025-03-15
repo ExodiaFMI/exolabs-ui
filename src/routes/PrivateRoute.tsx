@@ -1,8 +1,9 @@
 import { Navigate, Outlet } from 'react-router';
+import useJWT from '../hooks/useJWT';
 
 const PrivateRoute = () => {
-  const token = sessionStorage.getItem('token');
-  return token ? <Outlet /> : <Navigate to="/login" />;
+  const { isAuthenticated } = useJWT();
+  return isAuthenticated() ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default PrivateRoute;
