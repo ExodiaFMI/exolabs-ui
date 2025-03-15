@@ -56,7 +56,7 @@ const LoginForm = ({
           required
         />
       </Field>
-      <Button type="submit" className="w-full mt-4">
+      <Button type="submit" className="w-full mt-4 cursor-pointer">
         Login
       </Button>
       <p className="text-black mt-4 text-center">
