@@ -4,6 +4,7 @@ import Signup from '../pages/Signup';
 import PrivateRoute from './PrivateRoute';
 import Dashboard from '../pages/Dashboard';
 import StudyTheoryMode from '../pages/study/StudyTheoryMode';
+import Layout from '../layout/layout';
 
 const AppRoutes = () => {
   return (
@@ -11,7 +12,15 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/study" element={<StudyTheoryMode />} />
+          <Route path="/study/:courseId" element={<StudyTheoryMode />} />
+          <Route
+            path="/dashboard"
+            element={
+              <Layout>
+                <Dashboard />
+              </Layout>
+            }
+          />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />

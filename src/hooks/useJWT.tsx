@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
+interface User {
+  id: string;
+  email: string;
+  name: string;
+}
+
 const useJWT = () => {
   const [token, setTokenState] = useState<string | null>(sessionStorage.getItem('token'));
+  const [user, setUser] = useState<User | null>(null);
 
   const isTokenExpired = (token: string | null): boolean => {
     if (!token) return true;
@@ -33,9 +40,17 @@ const useJWT = () => {
   };
 
   useEffect(() => {
+    if (!token) {
+      setUser(null);
+      return;
+    }
+
     if (isTokenExpired(token)) {
       removeToken();
     }
+
+    const payload: { email: string; userId: string; name: string } = jwtDecode(token);
+    setUser({ email: payload.email, id: payload.userId, name: payload.name });
 
     const handleStorageChange = () => {
       setTokenState(sessionStorage.getItem('token'));
@@ -53,6 +68,7 @@ const useJWT = () => {
     setToken,
     removeToken,
     isAuthenticated,
+    user,
   };
 };
 
