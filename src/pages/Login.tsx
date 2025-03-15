@@ -18,6 +18,7 @@ const Login = () => {
   const handleLogin = async (email: string, password: string) => {
     setError('');
     setSuccess('');
+    setMessage(''); // Clear any previous messages
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: 'POST',
