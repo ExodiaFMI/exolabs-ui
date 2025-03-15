@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import LoginForm from '../components/auth/LoginForm';
+import useJWT from '../hooks/useJWT';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -8,6 +9,13 @@ const Login = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [message, setMessage] = useState('');
+  const { isAuthenticated } = useJWT();
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     if (location.state && location.state.message) {
