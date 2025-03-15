@@ -75,7 +75,6 @@ const StudyTheoryMode: React.FC<{ topic: Topic }> = ({ topic }) => {
             <HiArrowLeft />
           </Button>
           <h1 className="text-3xl font-bold mb-4">Topic: {topic.topic}</h1>
-          <h2 className="text-2xl font-semibold mb-4">AI Explainer</h2>
           <section className="bg-gray-100 p-4 rounded-lg mb-4">
             <div className="mb-4">
               <h3 className="text-xl font-semibold">
