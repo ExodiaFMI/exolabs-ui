@@ -1,12 +1,9 @@
 {
   "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
   "compilerOptions": {
     "paths": {
-      "@catalyst/*": ["src/lib/catalyst/*"]
+      "@catalyst/*": ["/src/lib/catalyst/*"]
     }
   }
 }
