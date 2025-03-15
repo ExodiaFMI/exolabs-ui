@@ -46,7 +46,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           </Dropdown>
         </div>
       </Navbar>
-      <main className="m-2">
+      <main className="p-2 bg-gray-100">
         <NavbarSettingsContext.Provider value={{ setBreadcrumb }}>
           {children}
         </NavbarSettingsContext.Provider>
