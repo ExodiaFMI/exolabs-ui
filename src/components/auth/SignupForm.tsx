@@ -2,36 +2,27 @@ import { useState } from 'react';
 import { Button } from '../../lib/catalyst/button';
 import { Field, Label } from '../../lib/catalyst/fieldset';
 import { Input } from '../../lib/catalyst/input';
-import { useNavigate } from 'react-router';
 
-const SignupForm = () => {
-  const navigate = useNavigate();
+interface SignupFormProps {
+  onSubmit: (name: string, email: string, password: string) => void;
+  error: string;
+  success: string;
+  onLoginRedirectClick: () => void;
+}
+
+const SignupForm = ({
+  onSubmit,
+  error,
+  success,
+  onLoginRedirectClick,
+}: SignupFormProps) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
-      if (!response.ok) {
-        throw new Error('Signup failed');
-      }
-      setSuccess('Signup successful!');
-      navigate('/login', { state: { message: 'Signup successful!' } });
-    } catch (err) {
-      setError(err.message);
-    }
+    onSubmit(name, email, password);
   };
 
   return (
@@ -83,7 +74,7 @@ const SignupForm = () => {
         Already have an account?{' '}
         <a
           href="#"
-          onClick={() => navigate('/login')}
+          onClick={onLoginRedirectClick}
           className="text-blue-500 hover:underline">
           Login
         </a>

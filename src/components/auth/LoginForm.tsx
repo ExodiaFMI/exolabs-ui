@@ -1,46 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '../../lib/catalyst/button';
 import { Field, Label } from '../../lib/catalyst/fieldset';
 import { Input } from '../../lib/catalyst/input';
-import { useNavigate, useLocation } from 'react-router';
 
-const LoginForm = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+interface LoginFormProps {
+  onSubmit: (email: string, password: string) => void;
+  error: string;
+  success: string;
+  message: string;
+  onSignUpRedirectClick: () => void;
+}
+
+const LoginForm = ({
+  onSubmit,
+  error,
+  success,
+  message,
+  onSignUpRedirectClick,
+}: LoginFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    if (location.state && location.state.message) {
-      setMessage(location.state.message);
-    }
-  }, [location.state]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
-      const data = await response.json();
-      sessionStorage.setItem('token', data.token);
-      setSuccess('Login successful!');
-      navigate('/dashboard'); // Redirect to a protected route
-    } catch (err) {
-      setError(err.message);
-    }
+    onSubmit(email, password);
   };
 
   return (
@@ -80,7 +63,7 @@ const LoginForm = () => {
         Don't have an account?{' '}
         <a
           href="#"
-          onClick={() => navigate('/signup')}
+          onClick={onSignUpRedirectClick}
           className="text-blue-500 hover:underline">
           Sign up
         </a>
