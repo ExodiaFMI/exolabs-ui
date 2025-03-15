@@ -31,6 +31,9 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
   const [currentSubtopicIndex, setCurrentSubtopicIndex] = useState(0);
   const [showChatBox, setShowChatBox] = useState(false);
   const [showInteractive, setShowInteractive] = useState(false);
+  const [interactiveType, setInteractiveType] = useState<
+    'visualization' | 'video' | 'image'
+  >('visualization');
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const topicHeadingRef = useRef<HTMLDivElement>(null);
   const interactiveRef = useRef<HTMLDivElement>(null);
@@ -55,7 +58,8 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
     setShowChatBox(true);
   };
 
-  const handleShowInteractive = () => {
+  const handleShowInteractive = (type: 'visualization' | 'video' | 'image') => {
+    setInteractiveType(type);
     setShowInteractive(true);
     if (interactiveRef.current) {
       interactiveRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -92,12 +96,12 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
         <main className="col-span-3 p-4 text-black">
           <div className="mb-4 sticky top-0 bg-light p-4 z-1000">
             <div className="flex justify-between mb-2 items-center">
-              {/* <Button
+              <Button
                 onClick={handlePrevious}
                 className="text-white py-2 px-6 rounded-lg flex items-center">
-                <HiArrowLeft /> Go back
-              </Button> */}
-              <div className="flex-grow">
+                <HiArrowLeft />
+              </Button>
+              <div className="flex-grow mx-4">
                 <div className="flex justify-between items-center mb-2">
                   <span>
                     {currentSubtopicIndex > 0
@@ -130,15 +134,27 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
             </div>
           </section>
           {isInteractive && !showInteractive && (
-            <Button
-              onClick={handleShowInteractive}
-              className="text-white py-2 px-6 rounded-lg mb-4">
-              Show Interactive
-            </Button>
+            <div className="flex space-x-4 mb-4">
+              <Button
+                onClick={() => handleShowInteractive('visualization')}
+                className="text-white py-2 px-6 rounded-lg">
+                Show Visualization
+              </Button>
+              <Button
+                onClick={() => handleShowInteractive('video')}
+                className="text-white py-2 px-6 rounded-lg">
+                Generate Video
+              </Button>
+              <Button
+                onClick={() => handleShowInteractive('image')}
+                className="text-white py-2 px-6 rounded-lg">
+                Generate Image
+              </Button>
+            </div>
           )}
           {isInteractive && showInteractive && (
             <div ref={interactiveRef}>
-              <Interactive src={interactiveSrc} />
+              <Interactive src={interactiveSrc} type={interactiveType} />
             </div>
           )}
           <div className="flex justify-end mb-4 space-x-4">
