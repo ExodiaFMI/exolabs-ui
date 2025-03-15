@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
 interface User {
-  id: string;
+  id: number;
   email: string;
   name: string;
 }
@@ -50,7 +50,7 @@ const useJWT = () => {
     }
 
     const payload: { email: string; userId: string; name: string } = jwtDecode(token);
-    setUser({ email: payload.email, id: payload.userId, name: payload.name });
+    setUser({ email: payload.email, id: Number(payload.userId), name: payload.name });
 
     const handleStorageChange = () => {
       setTokenState(sessionStorage.getItem('token'));
