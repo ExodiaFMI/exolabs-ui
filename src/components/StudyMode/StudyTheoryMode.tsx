@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   HiThumbDown,
   HiThumbUp,
@@ -9,19 +9,12 @@ import {
 import { Button } from '../../lib/catalyst/button';
 import Interactive from '../Interactive/Interactive';
 import ChatBox from '../ChatBox/ChatBox';
-
-interface Subtopic {
-  name: string;
-  text: string;
-}
-
-interface Topic {
-  topic: string;
-  subtopics: Subtopic[];
-}
+import { TopicResponseDto, SubtopicResponseDto } from '../../codegen';
+import { useParams } from 'react-router';
+import ReactMarkdown from 'react-markdown';
 
 interface StudyTheoryModeProps {
-  topic: Topic;
+  topic: TopicResponseDto & { subtopics: SubtopicResponseDto[] };
   isInteractive: boolean;
   interactiveSrc: string;
 }
@@ -32,18 +25,42 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
   isInteractive,
 }) => {
   const [currentSubtopicIndex, setCurrentSubtopicIndex] = useState(0);
+  const [showChatBox, setShowChatBox] = useState(false);
+  const chatBoxRef = useRef<HTMLDivElement>(null);
+  const topicHeadingRef = useRef<HTMLDivElement>(null);
 
   const handleNext = () => {
     if (currentSubtopicIndex < topic.subtopics.length - 1) {
       setCurrentSubtopicIndex(currentSubtopicIndex + 1);
+      setShowChatBox(false); // Hide ChatBox when moving to the next subtopic
+      scrollToTop();
     }
   };
 
   const handlePrevious = () => {
     if (currentSubtopicIndex > 0) {
       setCurrentSubtopicIndex(currentSubtopicIndex - 1);
+      setShowChatBox(false); // Hide ChatBox when moving to the previous subtopic
+      scrollToTop();
     }
   };
+
+  const handleDidntUnderstand = () => {
+    setShowChatBox(true);
+  };
+
+  const scrollToTop = () => {
+    if (topicHeadingRef.current) {
+      topicHeadingRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    if (showChatBox && chatBoxRef.current) {
+      chatBoxRef.current.scrollIntoView({ behavior: 'smooth' });
+      chatBoxRef.current.focus();
+    }
+  }, [showChatBox]);
 
   const handleReset = () => {
     setCurrentSubtopicIndex(0);
@@ -86,18 +103,22 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
             className="text-white py-2 px-6 rounded-lg mb-4">
             <HiArrowLeft />
           </Button>
-          <h1 className="text-3xl font-bold mb-4">Topic: {topic.topic}</h1>
+          <h1 ref={topicHeadingRef} className="text-3xl font-bold mb-4">
+            Topic: {topic.name}
+          </h1>
           <section className="bg-gray-100 p-4 rounded-lg mb-4">
             <div className="mb-4">
               <h3 className="text-xl font-semibold">
                 {topic.subtopics[currentSubtopicIndex].name}
               </h3>
-              <p>{topic.subtopics[currentSubtopicIndex].text}</p>
+              <ReactMarkdown>{topic.subtopics[currentSubtopicIndex].text}</ReactMarkdown>
             </div>
           </section>
           {isInteractive && <Interactive src={interactiveSrc} />}
           <div className="flex justify-end mb-4 space-x-4">
-            <Button onClick={handlePrevious} className="text-white py-2 px-6 rounded-lg">
+            <Button
+              onClick={handleDidntUnderstand}
+              className="text-white py-2 px-6 rounded-lg">
               <HiQuestionMarkCircle className="my-auto text-lg" /> Didn't Understand
             </Button>
             <Button onClick={handleNext} className="text-white py-2 px-6 rounded-lg">
@@ -108,7 +129,11 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
             {currentSubtopicIndex + 1} / {topic.subtopics.length}
           </div>
           <Button className="text-white py-2 px-4 rounded-lg mt-4">Generate Quiz</Button>
-          <ChatBox />
+          {showChatBox && (
+            <div ref={chatBoxRef}>
+              <ChatBox />
+            </div>
+          )}
         </main>
       </div>
     </div>
