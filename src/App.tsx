@@ -1,14 +1,13 @@
 import './App.css';
 import Layout from './layout/layout';
+import AppRoutes from './routes/AppRoutes';
 
-function App() {
+const App = () => {
   return (
-    <>
-      <Layout>
-        <h1>content</h1>
-      </Layout>
-    </>
+    <Layout>
+      <AppRoutes />
+    </Layout>
   );
-}
+};
 
 export default App;
