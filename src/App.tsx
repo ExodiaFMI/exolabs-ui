@@ -1,5 +1,3 @@
-export default App;
-  
 import './App.css';
 import Layout from './layout/layout';
 import AppRoutes from './routes/AppRoutes';
