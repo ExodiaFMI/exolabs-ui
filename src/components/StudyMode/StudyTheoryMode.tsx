@@ -7,6 +7,8 @@ import {
   HiQuestionMarkCircle,
 } from 'react-icons/hi';
 import { Button } from '../../lib/catalyst/button';
+import Interactive from '../Interactive/Interactive';
+import ChatBox from '../ChatBox/ChatBox';
 
 interface Subtopic {
   name: string;
@@ -18,7 +20,17 @@ interface Topic {
   subtopics: Subtopic[];
 }
 
-const StudyTheoryMode: React.FC<{ topic: Topic }> = ({ topic }) => {
+interface StudyTheoryModeProps {
+  topic: Topic;
+  isInteractive: boolean;
+  interactiveSrc: string;
+}
+
+const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
+  topic,
+  interactiveSrc,
+  isInteractive,
+}) => {
   const [currentSubtopicIndex, setCurrentSubtopicIndex] = useState(0);
 
   const handleNext = () => {
@@ -40,7 +52,7 @@ const StudyTheoryMode: React.FC<{ topic: Topic }> = ({ topic }) => {
   return (
     <div className="container mx-auto p-4">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <aside className="bg-gray-200 text-secondary p-4 rounded-lg">
+        <aside className="bg-gray-200 text-secondary p-4 rounded-lg sticky top-4">
           <h2 className="text-xl font-semibold mb-2">Sources</h2>
           <p className="text-base">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio.
@@ -48,7 +60,7 @@ const StudyTheoryMode: React.FC<{ topic: Topic }> = ({ topic }) => {
           </p>
         </aside>
         <main className="col-span-3 p-4 text-black">
-          <div className="mb-4">
+          <div className="mb-4 sticky top-0 bg-light p-4 z-1000">
             <div className="flex justify-between items-center mb-2">
               <span>
                 {currentSubtopicIndex > 0
@@ -83,6 +95,7 @@ const StudyTheoryMode: React.FC<{ topic: Topic }> = ({ topic }) => {
               <p>{topic.subtopics[currentSubtopicIndex].text}</p>
             </div>
           </section>
+          {isInteractive && <Interactive src={interactiveSrc} />}
           <div className="flex justify-end mb-4 space-x-4">
             <Button onClick={handlePrevious} className="text-white py-2 px-6 rounded-lg">
               <HiQuestionMarkCircle className="my-auto text-lg" /> Didn't Understand
@@ -95,6 +108,7 @@ const StudyTheoryMode: React.FC<{ topic: Topic }> = ({ topic }) => {
             {currentSubtopicIndex + 1} / {topic.subtopics.length}
           </div>
           <Button className="text-white py-2 px-4 rounded-lg mt-4">Generate Quiz</Button>
+          <ChatBox />
         </main>
       </div>
     </div>
