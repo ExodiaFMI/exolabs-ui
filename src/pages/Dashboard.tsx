@@ -1,6 +1,5 @@
 import { FC, use, useEffect, useState } from 'react';
 import { HiOutlinePlusCircle } from 'react-icons/hi';
-import { CreateCourseDto } from '../codegen';
 import CourseCard from '../components/user-dashboard/CourseCard';
 import { COURSE_CARDS } from '../constants/courses';
 import BreadcrumbContext from '../layout/breadcrumbContext';
@@ -9,6 +8,7 @@ import { Dialog, DialogActions, DialogBody, DialogTitle } from '../lib/catalyst/
 import { Field, Label } from '../lib/catalyst/fieldset';
 import { Input } from '../lib/catalyst/input';
 import { Listbox, ListboxLabel, ListboxOption } from '../lib/catalyst/listbox';
+import { useNavigate } from 'react-router';
 
 const Dashboard: FC = () => {
   const { setBreadcrumb } = use(BreadcrumbContext);
@@ -18,16 +18,24 @@ const Dashboard: FC = () => {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const navigate = useNavigate();
+
+  const onCourseClick = (id: number) => {
+    navigate(`/study/${id}`);
+  };
+
   return (
     <section className="text-dark p-6">
       <div className="grid grid-cols-3 gap-10">
         {COURSE_CARDS.map(card => (
-          <CourseCard
-            key={card.id}
-            progress={card.progress}
-            title={card.title}
-            description={card.message}
-          />
+          <div className="cursor-pointer" onClick={() => onCourseClick(card.id)}>
+            <CourseCard
+              key={card.id}
+              progress={card.progress}
+              title={card.title}
+              description={card.message}
+            />
+          </div>
         ))}
         <section
           className="w-full gap-3 h-full flex items-center justify-center text-secondary hover:text-info cursor-pointer"

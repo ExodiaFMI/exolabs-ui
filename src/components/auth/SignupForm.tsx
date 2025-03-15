@@ -67,7 +67,7 @@ const SignupForm = ({
           className="w-full"
         />
       </Field>
-      <Button type="submit" className="w-full p-2 bg-blue-500 text-white">
+      <Button type="submit" className="w-full p-2 bg-blue-500 text-white cursor-pointer">
         Signup
       </Button>
       <p className="text-black mt-4 text-center">
