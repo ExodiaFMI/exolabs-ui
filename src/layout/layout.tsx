@@ -36,22 +36,18 @@ const Layout: FC<LayoutProps> = ({ children }) => {
         </div>
         <div className="flex items-center gap-3">
           <Dropdown>
-            <DropdownButton color="dark/white" className="flex items-center">
+            <DropdownButton plain color="white" className="flex items-center">
               <Avatar
                 initials={user?.name.substring(0, 2).toUpperCase()}
-                className="size-10"
+                className="size-10 text-light border-light border-1"
               />
-              {user?.name}
-              <HiChevronDoubleDown />
+              <span className="text-light">{user?.name}</span>
+              <HiChevronDoubleDown className="text-light" size={20} />
             </DropdownButton>
             <DropdownMenu>
-              <DropdownItem className="bg-primary hover:bg-secondary hover:text-red-500">
-                Options
-              </DropdownItem>
+              <DropdownItem className="bg-primary">Options</DropdownItem>
               <DropdownItem className="bg-primary hover:bg-secondary">
-                <span
-                  className="flex gap-2 hover:text-red-500"
-                  onClick={() => onSignout()}>
+                <span className="flex gap-2" onClick={() => onSignout()}>
                   Signout <HiOutlineLogin className="size-5" />
                 </span>
               </DropdownItem>
