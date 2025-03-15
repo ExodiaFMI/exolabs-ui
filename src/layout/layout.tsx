@@ -44,7 +44,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
               <span className="text-light">{user?.name}</span>
               <HiChevronDoubleDown className="text-light" size={20} />
             </DropdownButton>
-            <DropdownMenu>
+            <DropdownMenu className="z-1020 p-2 flex- gap-2">
               <DropdownItem className="bg-primary">Options</DropdownItem>
               <DropdownItem className="bg-primary hover:bg-secondary">
                 <span className="flex gap-2" onClick={() => onSignout()}>
