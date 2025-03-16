@@ -61,6 +61,9 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
 
   const handleNext = () => {
     setShowChatBox(false);
+    setImageUrl('');
+    setVideoUrl('');
+    setBiolink('');
     scrollToTop();
     if (currentSubtopicIndex < (topic?.subtopics.length ?? 0) - 1) {
       setCurrentSubtopicIndex(currentSubtopicIndex + 1);
@@ -71,6 +74,9 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
 
   const handlePrevious = () => {
     setShowChatBox(false);
+    setImageUrl('');
+    setVideoUrl('');
+    setBiolink('');
     scrollToTop();
     if (currentSubtopicIndex > 0) {
       setCurrentSubtopicIndex(currentSubtopicIndex - 1);
@@ -234,19 +240,19 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
             <>
               {biolinkMutation.isSuccess && (
                 <div ref={interactiveRef}>
-                  <Interactive src={biolink} type={interactiveType} />
+                  <Interactive src={biolink} type="visualization" />
                 </div>
               )}
               {biolinkMutation.isPending && <div>Loading visualization...</div>}
               {agentImgeMutation.isSuccess && (
                 <div ref={interactiveRef}>
-                  <Interactive src={biolink} type={interactiveType} />
+                  <Interactive src={imageUrl} type="image" />
                 </div>
               )}
               {agentImgeMutation.isPending && <div>Loading image...</div>}
               {agentVideoMutation.isSuccess && (
                 <div ref={interactiveRef}>
-                  <Interactive src={biolink} type={interactiveType} />
+                  <Interactive src={videoUrl} type="video" />
                 </div>
               )}
               {agentVideoMutation.isPending && <div>Loading video...</div>}
@@ -264,11 +270,6 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
               OK, next <HiArrowRight className="max-width-100" />
             </Button>
           </div>
-          {/* {topic?.subtopics.length && (
-            <div className="text-center">
-              {currentSubtopicIndex + 1} / {topic.subtopics.length}
-            </div>
-          )} */}
           <Button className="cursor-pointer text-white py-2 px-4 rounded-lg mt-4">
             Generate Quiz
           </Button>
