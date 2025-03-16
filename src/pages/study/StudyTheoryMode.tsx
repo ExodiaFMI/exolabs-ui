@@ -1,9 +1,10 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
+import { useSuspenseQuery, useMutation } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import {
   SubtopicResponseDto,
   SubtopicsApi,
+  AgentApi,
   TopicResponseDto,
   TopicsApi,
 } from '../../codegen';
@@ -14,6 +15,7 @@ const StudyTheoryModePage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const topicsClient = useApiClient(TopicsApi);
   const subtopicsClient = useApiClient(SubtopicsApi);
+  const agentClient = useApiClient(AgentApi);
 
   const [currentTopicIndex, setCurrentTopicIndex] = useState(0);
 
@@ -34,6 +36,35 @@ const StudyTheoryModePage: React.FC = () => {
       }),
   });
 
+  const [chatSessionId, setChatSessionId] = useState<string | null>(null);
+  const [chatMessages, setChatMessages] = useState<string[]>([]);
+
+  const startChatMutation = useMutation({
+    mutationFn: () =>
+      agentClient.agentControllerStartChat({
+        agentControllerStartChatRequest: { message: 'Start' },
+      }),
+    onSuccess: data => {
+      const { sessionId, history } = data;
+      if (sessionId && history) {
+        setChatSessionId(sessionId);
+        setChatMessages(history);
+      }
+    },
+  });
+
+  const sendMessageMutation = useMutation({
+    mutationFn: (message: string) =>
+      agentClient.agentControllerSendMessage({
+        agentControllerSendMessageRequest: { sessionId: chatSessionId ?? '', message },
+      }),
+    onSuccess: data => {
+      if (!data.history) return;
+      setChatMessages(data.history);
+    },
+  });
+
+  const isInteractive = true;
   const interactiveSrc =
     'https://human.biodigital.com/view?id=production/maleAdult/nerves_of_pharynx_guided&lang=en';
 
@@ -70,6 +101,10 @@ const StudyTheoryModePage: React.FC = () => {
         topic={topicWithSubtopics}
         interactiveSrc={interactiveSrc}
         isInteractive={false}
+        startChat={() => startChatMutation.mutate()}
+        sendMessage={sendMessageMutation.mutate}
+        chatSessionId={chatSessionId}
+        chatMessages={chatMessages}
         onSubtopicsNextEnd={() => onSubtopicsEnd()}
         onSubtopicsPrevStart={() => onSubtopicsStart()}
       />

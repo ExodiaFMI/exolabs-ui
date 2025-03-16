@@ -14,6 +14,10 @@ interface SubtopicOverviewProps {
   topic: (TopicResponseDto & { subtopics: SubtopicResponseDto[] }) | null;
   isInteractive: boolean;
   interactiveSrc: string;
+  startChat: () => void;
+  sendMessage: (message: string) => void;
+  chatSessionId: string | null;
+  chatMessages: string[];
   onSubtopicsNextEnd?: () => void;
   onSubtopicsPrevStart?: () => void;
 }
@@ -22,6 +26,10 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
   topic,
   interactiveSrc,
   isInteractive,
+  startChat,
+  sendMessage,
+  chatSessionId,
+  chatMessages,
   onSubtopicsNextEnd,
   onSubtopicsPrevStart,
 }) => {
@@ -62,6 +70,9 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
 
   const handleDidntUnderstand = () => {
     setShowChatBox(true);
+    if (!chatSessionId) {
+      startChat();
+    }
   };
 
   const handleShowInteractive = (type: 'visualization' | 'video' | 'image') => {
@@ -182,7 +193,7 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
           </Button>
           {showChatBox && (
             <div ref={chatBoxRef}>
-              <ChatBox />
+              <ChatBox sendMessage={sendMessage} chatMessages={chatMessages} />
             </div>
           )}
         </main>
