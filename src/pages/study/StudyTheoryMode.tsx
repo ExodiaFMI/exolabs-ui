@@ -42,7 +42,9 @@ const StudyTheoryModePage: React.FC = () => {
   const startChatMutation = useMutation({
     mutationFn: () =>
       agentClient.agentControllerStartChat({
-        agentControllerStartChatRequest: { message: 'Start' },
+        agentControllerStartChatRequest: {
+          message: 'Describe the topic in just a few words.',
+        },
       }),
     onSuccess: data => {
       const { sessionId, history } = data;
