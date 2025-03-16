@@ -32,7 +32,6 @@ const StudyTheoryModePage: React.FC = () => {
         courseId: Number(courseId),
         topicId: selectedTopic?.id ?? 0,
       }),
-    enabled: !!selectedTopic,
   });
 
   const interactiveSrc =
