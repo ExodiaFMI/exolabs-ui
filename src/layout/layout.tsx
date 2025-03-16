@@ -38,7 +38,11 @@ const Layout: FC<LayoutProps> = ({ children }) => {
             className="h-10 border-r-1 border-grey-600 pr-1"
           />
           <h1 className="text-xl">Exolab</h1>
-          <a>{breadcrumb}</a>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="border-2 border-white text-white px-3 py-1 rounded hover:bg-white hover:text-secondary transition">
+            Home
+          </button>
         </div>
         <div className="flex items-center gap-3">
           <Dropdown>
