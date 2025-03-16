@@ -5,17 +5,29 @@ import { Field } from '../../lib/catalyst/fieldset';
 import { Input } from '../../lib/catalyst/input';
 import './ChatBox.css'; // Import the CSS file for styling
 import { HiArrowNarrowUp } from 'react-icons/hi';
+
 interface ChatBoxProps {
   sendMessage: (message: string) => void;
+  startChat: (message: string) => void;
   chatMessages: string[];
+  chatSessionId: string | null;
 }
 
-const ChatBox: React.FC<ChatBoxProps> = ({ sendMessage, chatMessages }) => {
+const ChatBox: React.FC<ChatBoxProps> = ({
+  sendMessage,
+  startChat,
+  chatMessages,
+  chatSessionId,
+}) => {
   const [input, setInput] = useState<string>('');
 
   const handleSend = () => {
     if (input.trim()) {
-      sendMessage(input);
+      if (!chatSessionId) {
+        startChat(input);
+      } else {
+        sendMessage(input);
+      }
       setInput('');
     }
   };
@@ -25,7 +37,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ sendMessage, chatMessages }) => {
       {/* <h2 className="text-xl font-bold mb-4"></h2> */}
       <div className="messages mb-4">
         {chatMessages.map((message, index) => (
-          <div key={index} className="message mb-2 p-2 bg-gray-100 rounded">
+          <div key={index} className="message mb-2 p-2 border rounded">
             <ReactMarkdown>{message}</ReactMarkdown>
           </div>
         ))}

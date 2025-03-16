@@ -38,11 +38,15 @@ const StudyTheoryModePage: React.FC = () => {
 
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<string[]>([]);
+  const [subtopicId, setSubtopicId] = useState<number | null>(null);
 
   const startChatMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (message: string) =>
       agentClient.agentControllerStartChat({
-        agentControllerStartChatRequest: { message: 'Start' },
+        agentControllerStartChatRequest: {
+          message,
+          subtopicId: subtopicId?.toString() ?? '',
+        },
       }),
     onSuccess: data => {
       const { sessionId, history } = data;
@@ -54,9 +58,13 @@ const StudyTheoryModePage: React.FC = () => {
   });
 
   const sendMessageMutation = useMutation({
-    mutationFn: (message: string) =>
+    mutationFn: ({ message, subtopicId }: { message: string; subtopicId: number }) =>
       agentClient.agentControllerSendMessage({
-        agentControllerSendMessageRequest: { sessionId: chatSessionId ?? '', message },
+        agentControllerSendMessageRequest: {
+          sessionId: chatSessionId ?? '',
+          message,
+          subtopicId: subtopicId.toString(),
+        },
       }),
     onSuccess: data => {
       if (!data.history) return;
@@ -64,7 +72,6 @@ const StudyTheoryModePage: React.FC = () => {
     },
   });
 
-  const isInteractive = true;
   const interactiveSrc =
     'https://human.biodigital.com/view?id=production/maleAdult/nerves_of_pharynx_guided&lang=en';
 
@@ -100,13 +107,22 @@ const StudyTheoryModePage: React.FC = () => {
       <SubtopicOverview
         topic={topicWithSubtopics}
         interactiveSrc={interactiveSrc}
-        isInteractive={false}
-        startChat={() => startChatMutation.mutate()}
-        sendMessage={sendMessageMutation.mutate}
+        isInteractive={true}
+        startChat={(message: string) => {
+          if (subtopicId !== null) {
+            startChatMutation.mutate(message);
+          }
+        }}
+        sendMessage={(message: string) => {
+          if (subtopicId !== null) {
+            sendMessageMutation.mutate({ message, subtopicId });
+          }
+        }}
         chatSessionId={chatSessionId}
         chatMessages={chatMessages}
         onSubtopicsNextEnd={() => onSubtopicsEnd()}
         onSubtopicsPrevStart={() => onSubtopicsStart()}
+        onSubtopicChange={(id: number) => setSubtopicId(id)}
       />
     </section>
   );

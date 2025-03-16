@@ -20,6 +20,7 @@ interface SubtopicOverviewProps {
   chatMessages: string[];
   onSubtopicsNextEnd?: () => void;
   onSubtopicsPrevStart?: () => void;
+  onSubtopicChange: (id: number) => void;
 }
 
 const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
@@ -32,6 +33,7 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
   chatMessages,
   onSubtopicsNextEnd,
   onSubtopicsPrevStart,
+  onSubtopicChange,
 }) => {
   const [currentSubtopicIndex, setCurrentSubtopicIndex] = useState(0);
   const [showChatBox, setShowChatBox] = useState(false);
@@ -39,6 +41,12 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
   useEffect(() => {
     setCurrentSubtopicIndex(0);
   }, [topic]);
+
+  useEffect(() => {
+    if (topic?.subtopics[currentSubtopicIndex]?.id) {
+      onSubtopicChange(topic.subtopics[currentSubtopicIndex].id);
+    }
+  }, [currentSubtopicIndex, topic, onSubtopicChange]);
 
   const [showInteractive, setShowInteractive] = useState(false);
   const [interactiveType, setInteractiveType] = useState<
@@ -188,12 +196,17 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
               {currentSubtopicIndex + 1} / {topic.subtopics.length}
             </div>
           )}
-          <Button className="cursor-pointer text-white py-2 px-4 rounded-lg mt-4">
+          {/* <Button className="cursor-pointer text-white py-2 px-4 rounded-lg mt-4">
             Generate Quiz
-          </Button>
+          </Button> */}
           {showChatBox && (
             <div ref={chatBoxRef}>
-              <ChatBox sendMessage={sendMessage} chatMessages={chatMessages} />
+              <ChatBox
+                sendMessage={sendMessage}
+                startChat={startChat}
+                chatMessages={chatMessages}
+                chatSessionId={chatSessionId}
+              />
             </div>
           )}
         </main>
