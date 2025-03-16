@@ -183,11 +183,11 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
               OK, next <HiArrowRight className="max-width-100" />
             </Button>
           </div>
-          {topic?.subtopics.length && (
+          {/* {topic?.subtopics.length && (
             <div className="text-center">
               {currentSubtopicIndex + 1} / {topic.subtopics.length}
             </div>
-          )}
+          )} */}
           <Button className="cursor-pointer text-white py-2 px-4 rounded-lg mt-4">
             Generate Quiz
           </Button>
