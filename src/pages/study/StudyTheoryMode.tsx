@@ -1,5 +1,5 @@
-import React from 'react';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { useSuspenseQuery, useMutation } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import StudyTheoryMode from '../../components/StudyMode/StudyTheoryMode';
 import {
@@ -7,6 +7,7 @@ import {
   TopicsApi,
   SubtopicResponseDto,
   SubtopicsApi,
+  AgentApi,
 } from '../../codegen';
 import { useApiClient } from '../../hooks/useApi';
 
@@ -14,6 +15,7 @@ const StudyTheoryModePage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const topicsClient = useApiClient(TopicsApi);
   const subtopicsClient = useApiClient(SubtopicsApi);
+  const agentClient = useApiClient(AgentApi);
 
   const { data: topics } = useSuspenseQuery<TopicResponseDto[]>({
     queryKey: ['topics', courseId],
@@ -31,6 +33,30 @@ const StudyTheoryModePage: React.FC = () => {
         topicId: topic?.id ?? 0,
       }),
     enabled: !!topic,
+  });
+
+  const [chatSessionId, setChatSessionId] = useState<string | null>(null);
+  const [chatMessages, setChatMessages] = useState<string[]>([]);
+
+  const startChatMutation = useMutation({
+    mutationFn: () =>
+      agentClient.agentControllerStartChat({
+        agentControllerStartChatRequest: { message: 'Start' },
+      }),
+    onSuccess: data => {
+      setChatSessionId(data.sessionId);
+      setChatMessages(data.history);
+    },
+  });
+
+  const sendMessageMutation = useMutation({
+    mutationFn: (message: string) =>
+      agentClient.agentControllerSendMessage({
+        agentControllerSendMessageRequest: { sessionId: chatSessionId ?? '', message },
+      }),
+    onSuccess: data => {
+      setChatMessages(data.history);
+    },
   });
 
   const isInteractive = true;
@@ -51,6 +77,10 @@ const StudyTheoryModePage: React.FC = () => {
       topic={topicWithSubtopics}
       interactiveSrc={interactiveSrc}
       isInteractive
+      startChat={() => startChatMutation.mutate({ message: 'Start' })}
+      sendMessage={sendMessageMutation.mutate}
+      chatSessionId={chatSessionId}
+      chatMessages={chatMessages}
     />
   );
 };

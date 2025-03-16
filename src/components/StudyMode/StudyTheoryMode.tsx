@@ -21,12 +21,20 @@ interface StudyTheoryModeProps {
   topic: TopicResponseDto & { subtopics: SubtopicResponseDto[] };
   isInteractive: boolean;
   interactiveSrc: string;
+  startChat: () => void;
+  sendMessage: (message: string) => void;
+  chatSessionId: string | null;
+  chatMessages: string[];
 }
 
 const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
   topic,
   interactiveSrc,
   isInteractive,
+  startChat,
+  sendMessage,
+  chatSessionId,
+  chatMessages,
 }) => {
   const [currentSubtopicIndex, setCurrentSubtopicIndex] = useState(0);
   const [showChatBox, setShowChatBox] = useState(false);
@@ -56,6 +64,9 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
 
   const handleDidntUnderstand = () => {
     setShowChatBox(true);
+    if (!chatSessionId) {
+      startChat();
+    }
   };
 
   const handleShowInteractive = (type: 'visualization' | 'video' | 'image') => {
@@ -114,9 +125,13 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
                       : 'End'}
                   </span>
                 </div>
-                <Progress
-                  progress={((currentSubtopicIndex + 1) / topic.subtopics.length) * 100}
-                />
+                <div className="relative w-full h-2 bg-gray-300 rounded">
+                  <div
+                    className="absolute top-0 h-2 bg-secondary rounded"
+                    style={{
+                      width: `${((currentSubtopicIndex + 1) / topic.subtopics.length) * 100}%`,
+                    }}></div>
+                </div>
               </div>
             </div>
           </div>
@@ -163,10 +178,8 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
               className="text-white py-2 px-6 rounded-lg">
               <HiQuestionMarkCircle className="my-auto text-lg" /> Didn't Understand
             </Button>
-            <Button
-              onClick={handleNext}
-              className="text-white py-2 px-6 rounded-lg my-auto">
-              Ok, next <HiArrowRight className="max-width-100" />
+            <Button onClick={handleNext} className="text-white py-2 px-6 rounded-lg">
+              Ok, next <HiArrowRight className="my-auto" />
             </Button>
           </div>
           <div className="text-center">
@@ -175,7 +188,7 @@ const StudyTheoryMode: React.FC<StudyTheoryModeProps> = ({
           <Button className="text-white py-2 px-4 rounded-lg mt-4">Generate Quiz</Button>
           {showChatBox && (
             <div ref={chatBoxRef}>
-              <ChatBox />
+              <ChatBox sendMessage={sendMessage} chatMessages={chatMessages} />
             </div>
           )}
         </main>
