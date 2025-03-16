@@ -16,6 +16,7 @@ import { Input } from '../../lib/catalyst/input';
 import { Select } from '../../lib/catalyst/select';
 import { Textarea } from '../../lib/catalyst/textarea';
 import fileToBase64 from '../../shared/helpers/file-to-base-64';
+import pdfToText from 'react-pdftotext';
 
 const formResolver = z.object({
   subject: z.string().nonempty(),
@@ -47,8 +48,8 @@ const CourseCreateDialog: FC<CourseCreateDialogProps> = ({
   const { user } = useJWT();
 
   const processFormData = () => {
-    fileToBase64(getValues().testInfo[0])
-      .then(base64 => {
+    pdfToText(getValues().testInfo[0])
+      .then(fileText => {
         const formValues = getValues();
         const courseDto: CreateCourseDto = {
           ownerId: user?.id ?? 0,
@@ -56,7 +57,7 @@ const CourseCreateDialog: FC<CourseCreateDialogProps> = ({
           subjectId: +formValues.subject,
           language: formValues.language,
           name: formValues.name,
-          testInfo: base64,
+          testInfo: fileText.slice(0, 40),
         };
         onCreate(courseDto);
         onClose();
@@ -125,12 +126,7 @@ const CourseCreateDialog: FC<CourseCreateDialogProps> = ({
           <Button type="button" plain onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            outline
-            className="border-2"
-            // onClick={() => console.log(formState.isValid)}
-          >
+          <Button type="submit" outline className="border-2">
             Create
           </Button>
         </DialogActions>

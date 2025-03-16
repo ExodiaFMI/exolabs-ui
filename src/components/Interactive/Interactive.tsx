@@ -6,12 +6,13 @@ interface InteractiveProps {
 }
 
 const Interactive: React.FC<InteractiveProps> = ({ src, type }) => {
+  console.log('Interactive component rendered ', src);
+
   return (
     <div className="my-4 pr-1">
       {type === 'visualization' && (
         <iframe
           id="embedded-human"
-          frameBorder="0"
           style={{ aspectRatio: '4 / 3', width: '100%' }}
           allowFullScreen={true}
           loading="lazy"
@@ -19,10 +20,8 @@ const Interactive: React.FC<InteractiveProps> = ({ src, type }) => {
       )}
       {type === 'video' && (
         <div>
-          {/* Add request to generate video */}
           <iframe
             id="embedded-video"
-            frameBorder="0"
             style={{ aspectRatio: '16 / 9', width: '100%' }}
             allowFullScreen={true}
             loading="lazy"
@@ -30,10 +29,7 @@ const Interactive: React.FC<InteractiveProps> = ({ src, type }) => {
         </div>
       )}
       {type === 'image' && (
-        <div>
-          {/* Add request to generate image */}
-          <img src={src} alt="Generated content" style={{ width: '100%' }} />
-        </div>
+        <img src={src} alt="Generated content" style={{ objectFit: 'cover' }} />
       )}
     </div>
   );
