@@ -109,7 +109,7 @@ const StudyTheoryModePage: React.FC = () => {
         interactiveSrc={interactiveSrc}
         isInteractive={true}
         startChat={(message: string) => {
-          if (subtopicId !== null) {
+          if (subtopicId !== null && message) {
             startChatMutation.mutate(message);
           }
         }}
