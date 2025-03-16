@@ -9,7 +9,7 @@ interface CourseCardProps {
 
 const CourseCard: FC<CourseCardProps> = ({ title, description, progress }) => {
   return (
-    <article className="flex flex-col gap-5 bg-secondary text-light p-4 rounded-lg shadow-lg">
+    <article className="flex flex-col justify-between h-full gap-5 bg-secondary text-light p-4 rounded-lg shadow-lg">
       <img className="h-35 w-full bg-primary rounded-lg" />
 
       <div>

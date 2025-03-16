@@ -49,7 +49,7 @@ const CourseCardList: FC = () => {
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-10">
+      <div className="grid grid-cols-3 items-stretch gap-10">
         {courses.map(card => (
           <div
             key={card.id}
@@ -63,7 +63,7 @@ const CourseCardList: FC = () => {
           </div>
         ))}
         <section
-          className="w-full gap-3 h-full flex items-center justify-center text-secondary hover:text-info cursor-pointer"
+          className="w-full h-70 border border-4 border-dashed border-secondary hover:border-info rounded gap-3 flex items-center justify-center text-secondary hover:text-info cursor-pointer"
           onClick={() => setIsDialogOpen(true)}>
           <HiOutlinePlusCircle size={60} />
           <h1 className="text-2xl">Add course</h1>
