@@ -46,11 +46,12 @@ const CourseCardList: FC = () => {
   const handleCourseCreate = (newCourse: CreateCourseDto) => {
     mutation.mutate(newCourse);
   };
-
+  const images = Array.from({ length: 10 }, (_, i) => `courses/${i + 1}.svg`);
+  console.log(images);
   return (
     <>
       <div className="grid grid-cols-3 items-stretch gap-10">
-        {courses.map(card => (
+        {courses.map((card, i) => (
           <div
             key={card.id}
             className="cursor-pointer"
@@ -59,6 +60,7 @@ const CourseCardList: FC = () => {
               progress={20}
               title={card.name ?? 'Subject'}
               description={card.description ?? 'Subject description'}
+              imageSrc={images[i]}
             />
           </div>
         ))}
