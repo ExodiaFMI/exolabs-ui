@@ -38,14 +38,19 @@ const StudyTheoryModePage: React.FC = () => {
 
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const startChatMutation = useMutation({
-    mutationFn: () =>
-      agentClient.agentControllerStartChat({
+    mutationFn: async () => {
+      setIsLoading(true);
+      const response = await agentClient.agentControllerStartChat({
         agentControllerStartChatRequest: {
           message: 'Describe the topic in just a few words.',
         },
-      }),
+      });
+      setIsLoading(false);
+      return response;
+    },
     onSuccess: data => {
       const { sessionId, history } = data;
       if (sessionId && history) {
@@ -56,10 +61,14 @@ const StudyTheoryModePage: React.FC = () => {
   });
 
   const sendMessageMutation = useMutation({
-    mutationFn: (message: string) =>
-      agentClient.agentControllerSendMessage({
+    mutationFn: async (message: string) => {
+      setIsLoading(true);
+      const response = await agentClient.agentControllerSendMessage({
         agentControllerSendMessageRequest: { sessionId: chatSessionId ?? '', message },
-      }),
+      });
+      setIsLoading(false);
+      return response;
+    },
     onSuccess: data => {
       if (!data.history) return;
       setChatMessages(data.history);
@@ -104,6 +113,7 @@ const StudyTheoryModePage: React.FC = () => {
         chatMessages={chatMessages}
         onSubtopicsNextEnd={() => onSubtopicsEnd()}
         onSubtopicsPrevStart={() => onSubtopicsStart()}
+        isLoading={isLoading}
       />
     </section>
   );

@@ -8,9 +8,10 @@ import { HiArrowNarrowUp } from 'react-icons/hi';
 interface ChatBoxProps {
   sendMessage: (message: string) => void;
   chatMessages: string[];
+  isLoading: boolean;
 }
 
-const ChatBox: React.FC<ChatBoxProps> = ({ sendMessage, chatMessages }) => {
+const ChatBox: React.FC<ChatBoxProps> = ({ sendMessage, chatMessages, isLoading }) => {
   const [input, setInput] = useState<string>('');
 
   const handleSend = () => {
@@ -32,6 +33,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ sendMessage, chatMessages }) => {
             </div>
           ))}
       </div>
+      {isLoading && (
+        <div className="flex justify-center items-center mb-4">
+          <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-8 w-8"></div>
+        </div>
+      )}
       <Field className="flex items-center gap-2">
         <Input
           type="text"

@@ -28,6 +28,7 @@ interface SubtopicOverviewProps {
   chatMessages: string[];
   onSubtopicsNextEnd?: () => void;
   onSubtopicsPrevStart?: () => void;
+  isLoading: boolean;
 }
 
 const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
@@ -39,6 +40,7 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
   chatMessages,
   onSubtopicsNextEnd,
   onSubtopicsPrevStart,
+  isLoading,
 }) => {
   const [currentSubtopicIndex, setCurrentSubtopicIndex] = useState(0);
   const [showChatBox, setShowChatBox] = useState(false);
@@ -274,7 +276,11 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
           </Button>
           {showChatBox && (
             <div ref={chatBoxRef}>
-              <ChatBox sendMessage={sendMessage} chatMessages={chatMessages} />
+              <ChatBox
+                sendMessage={sendMessage}
+                chatMessages={chatMessages}
+                isLoading={isLoading}
+              />
             </div>
           )}
         </main>
