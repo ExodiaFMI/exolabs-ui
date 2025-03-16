@@ -66,10 +66,6 @@ const StudyTheoryModePage: React.FC = () => {
     },
   });
 
-  const isInteractive = true;
-  const interactiveSrc =
-    'https://human.biodigital.com/view?id=production/maleAdult/nerves_of_pharynx_guided&lang=en';
-
   const topicWithSubtopics = selectedTopic ? { ...selectedTopic, subtopics } : null;
 
   const onSubtopicsEnd = () => {
@@ -101,8 +97,7 @@ const StudyTheoryModePage: React.FC = () => {
       </aside>
       <SubtopicOverview
         topic={topicWithSubtopics}
-        interactiveSrc={interactiveSrc}
-        isInteractive={false}
+        isInteractive
         startChat={() => startChatMutation.mutate()}
         sendMessage={sendMessageMutation.mutate}
         chatSessionId={chatSessionId}
