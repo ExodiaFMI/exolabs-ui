@@ -1,6 +1,7 @@
 import { createContext, FC, useState } from 'react';
 import { Avatar } from '../lib/catalyst/avatar';
 import { Navbar } from '../lib/catalyst/navbar';
+import logoUrl from '../assets/logo.png';
 import {
   Dropdown,
   DropdownButton,
@@ -29,9 +30,14 @@ const Layout: FC<LayoutProps> = ({ children }) => {
 
   return (
     <>
-      <Navbar className="bg-secondary text-light flex text-grey-100 justify-between px-4 py-3 flex-row border-b-2 border-grey-600">
+      <Navbar className="bg-secondary text-light flex text-grey-100 justify-between px-4 py-1 flex-row border-b-2 border-grey-600">
         <div className="flex items-center gap-5">
-          <h1 className="text-xl border-r-1 border-grey-600 pe-4">Exolabs</h1>
+          <img
+            src={logoUrl}
+            alt="Exolab Logo"
+            className="h-16 border-r-1 border-grey-600"
+          />
+          <h1 className="text-xl">Exolab</h1>
           <a>{breadcrumb}</a>
         </div>
         <div className="flex items-center gap-3">
