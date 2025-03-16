@@ -6,6 +6,8 @@ interface InteractiveProps {
 }
 
 const Interactive: React.FC<InteractiveProps> = ({ src, type }) => {
+  console.log('Interactive component rendered ', src);
+
   return (
     <div className="my-4 pr-1">
       {type === 'visualization' && (
@@ -31,7 +33,6 @@ const Interactive: React.FC<InteractiveProps> = ({ src, type }) => {
       )}
       {type === 'image' && (
         <div>
-          {/* Add request to generate image */}
           <img src={src} alt="Generated content" style={{ width: '100%' }} />
         </div>
       )}

@@ -1,19 +1,27 @@
+import { useMutation } from '@tanstack/react-query';
+import 'katex/dist/katex.min.css';
 import React, { useEffect, useRef, useState } from 'react';
 import { HiArrowLeft, HiArrowRight, HiQuestionMarkCircle } from 'react-icons/hi';
 import ReactMarkdown from 'react-markdown';
-import { SubtopicResponseDto, TopicResponseDto } from '../../codegen';
+import rehypeKatex from 'rehype-katex';
+import remarkMath from 'remark-math';
+import {
+  AgentApi,
+  BiolinksApi,
+  SubtopicResponseDto,
+  TopicResponseDto,
+} from '../../codegen';
+import { useApiClient } from '../../hooks/useApi';
 import { Button } from '../../lib/catalyst/button';
 import Progress from '../../shared/components/Progress';
 import ChatBox from '../ChatBox/ChatBox';
 import Interactive from '../Interactive/Interactive';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import 'katex/dist/katex.min.css';
+import { set } from 'react-hook-form';
 
+type GenerationTool = 'visualization' | 'video' | 'image';
 interface SubtopicOverviewProps {
   topic: (TopicResponseDto & { subtopics: SubtopicResponseDto[] }) | null;
   isInteractive: boolean;
-  interactiveSrc: string;
   startChat: () => void;
   sendMessage: (message: string) => void;
   chatSessionId: string | null;
@@ -24,7 +32,6 @@ interface SubtopicOverviewProps {
 
 const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
   topic,
-  interactiveSrc,
   isInteractive,
   startChat,
   sendMessage,
@@ -35,6 +42,10 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
 }) => {
   const [currentSubtopicIndex, setCurrentSubtopicIndex] = useState(0);
   const [showChatBox, setShowChatBox] = useState(false);
+
+  const [biolink, setBiolink] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [videoUrl, setVideoUrl] = useState<string>('');
 
   useEffect(() => {
     setCurrentSubtopicIndex(0);
@@ -75,8 +86,61 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
     }
   };
 
-  const handleShowInteractive = (type: 'visualization' | 'video' | 'image') => {
+  const biolinksClient = useApiClient(BiolinksApi);
+  const biolinkMutation = useMutation({
+    mutationFn: (subtopic: string) =>
+      biolinksClient.biolinksControllerSearchBiolinks({
+        biolinksControllerSearchBiolinksRequest: { queryText: subtopic },
+      }),
+    onSuccess: data => {
+      if (!data.results) return;
+      const result = data.results[0];
+      setBiolink(result?.href ?? '');
+    },
+  });
+
+  const agenstClient = useApiClient(AgentApi);
+  const agentImgeMutation = useMutation({
+    mutationFn: (message: string) => {
+      const subtopic = topic?.subtopics[currentSubtopicIndex];
+      return agenstClient.agentControllerGenerateImage({
+        agentControllerGenerateImageRequest: {
+          subtopicId: subtopic?.id ?? 0,
+          prompt: subtopic?.text ?? '',
+        },
+      });
+    },
+    onSuccess: data => setImageUrl(data?.imageUrl ?? ''),
+  });
+  const agentVideoMutation = useMutation({
+    mutationFn: (message: string) => {
+      const subtopic = topic?.subtopics[currentSubtopicIndex];
+      return agenstClient.agentControllerGenerateVideo({
+        agentControllerGenerateVideoRequest: {
+          subtopicId: subtopic?.id ?? 0,
+          prompt: subtopic?.text ?? '',
+        },
+      });
+    },
+    onSuccess: data => setImageUrl(data?.videoUrl ?? ''),
+  });
+
+  const handleShowInteractive = (type: GenerationTool) => {
     setInteractiveType(type);
+    const subtopic = topic?.subtopics[currentSubtopicIndex];
+    switch (type) {
+      case 'visualization':
+        biolinkMutation.mutate(subtopic?.name ?? '');
+        break;
+      case 'image':
+        agentImgeMutation.mutate(subtopic?.name ?? '');
+        break;
+      case 'video':
+        agentVideoMutation.mutate(subtopic?.name ?? '');
+        break;
+      default:
+        break;
+    }
     setShowInteractive(true);
     if (interactiveRef.current) {
       interactiveRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -147,7 +211,7 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
               </ReactMarkdown>
             </div>
           </section>
-          {isInteractive && !showInteractive && (
+          {isInteractive && (
             <div className="flex space-x-4 mb-4">
               <Button
                 onClick={() => handleShowInteractive('visualization')}
@@ -167,9 +231,26 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
             </div>
           )}
           {isInteractive && showInteractive && (
-            <div ref={interactiveRef}>
-              <Interactive src={interactiveSrc} type={interactiveType} />
-            </div>
+            <>
+              {biolinkMutation.isSuccess && (
+                <div ref={interactiveRef}>
+                  <Interactive src={biolink} type={interactiveType} />
+                </div>
+              )}
+              {biolinkMutation.isPending && <div>Loading visualization...</div>}
+              {agentImgeMutation.isSuccess && (
+                <div ref={interactiveRef}>
+                  <Interactive src={biolink} type={interactiveType} />
+                </div>
+              )}
+              {agentImgeMutation.isPending && <div>Loading image...</div>}
+              {agentVideoMutation.isSuccess && (
+                <div ref={interactiveRef}>
+                  <Interactive src={biolink} type={interactiveType} />
+                </div>
+              )}
+              {agentVideoMutation.isPending && <div>Loading video...</div>}
+            </>
           )}
           <div className="flex justify-end mb-4 space-x-4">
             <Button
