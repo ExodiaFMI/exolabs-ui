@@ -35,7 +35,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           <img
             src={logoUrl}
             alt="Exolab Logo"
-            className="h-16 border-r-1 border-grey-600"
+            className="h-10 border-r-1 border-grey-600 pr-1"
           />
           <h1 className="text-xl">Exolab</h1>
           <a>{breadcrumb}</a>
