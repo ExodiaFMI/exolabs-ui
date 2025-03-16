@@ -51,7 +51,7 @@ const StudyTheoryModePage: React.FC = () => {
   return (
     <section className="flex justify-between gap-5 px-15">
       <aside className="bg-gray-200 w-120 h- text-secondary p-4 rounded-lg sticky top-4">
-        <h2 className="text-xl font-semibold mb-2">Topics</h2>
+        <h2 className="text-2xl font-semibold mb-2 ">Topics</h2>
         <ul>
           {topics.map((topic, idx) => (
             <li

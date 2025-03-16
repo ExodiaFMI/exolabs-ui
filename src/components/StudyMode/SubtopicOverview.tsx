@@ -6,6 +6,9 @@ import { Button } from '../../lib/catalyst/button';
 import Progress from '../../shared/components/Progress';
 import ChatBox from '../ChatBox/ChatBox';
 import Interactive from '../Interactive/Interactive';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 interface SubtopicOverviewProps {
   topic: TopicResponseDto & { subtopics: SubtopicResponseDto[] };
@@ -29,8 +32,13 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
     setCurrentSubtopicIndex(0);
   }, [topic]);
 
+  const [showInteractive, setShowInteractive] = useState(false);
+  const [interactiveType, setInteractiveType] = useState<
+    'visualization' | 'video' | 'image'
+  >('visualization');
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const topicHeadingRef = useRef<HTMLDivElement>(null);
+  const interactiveRef = useRef<HTMLDivElement>(null);
 
   const handleNext = () => {
     setShowChatBox(false);
@@ -56,6 +64,14 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
     setShowChatBox(true);
   };
 
+  const handleShowInteractive = (type: 'visualization' | 'video' | 'image') => {
+    setInteractiveType(type);
+    setShowInteractive(true);
+    if (interactiveRef.current) {
+      interactiveRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const scrollToTop = () => {
     if (topicHeadingRef.current) {
       topicHeadingRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -73,28 +89,38 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
     <div className="container mx-auto p-4">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <main className="col-span-3 p-4 text-black">
-          <div className="mb-4 sticky top-0 bg-light p-4 z-1000">
-            <div className="flex justify-between items-center mb-2">
-              <span>
-                {currentSubtopicIndex > 0
-                  ? topic.subtopics[currentSubtopicIndex - 1]?.name
-                  : 'Start'}
-              </span>
-              <span>
-                {currentSubtopicIndex < topic.subtopics.length - 1
-                  ? topic.subtopics[currentSubtopicIndex + 1]?.name
-                  : 'End'}
-              </span>
+          <div className="mb-4 sticky top-0 bg-light py-4 z-1000">
+            <div className="flex justify-between mb-2 items-center">
+              <Button
+                onClick={handlePrevious}
+                className="text-white py-2 px-6 rounded-lg flex items-center">
+                <HiArrowLeft />
+              </Button>
+              <div className="flex-grow mx-5">
+                <div className="flex justify-between items-center mb-2">
+                  <span>
+                    {currentSubtopicIndex > 0
+                      ? topic.subtopics[currentSubtopicIndex - 1]?.name
+                      : 'Start'}
+                  </span>
+                  <span>
+                    {currentSubtopicIndex < topic.subtopics.length - 1
+                      ? topic.subtopics[currentSubtopicIndex + 1]?.name
+                      : 'End'}
+                  </span>
+                </div>
+                <Progress
+                  progress={((currentSubtopicIndex + 1) / topic.subtopics.length) * 100}
+                />
+              </div>
+
+              <Button
+                onClick={handleNext}
+                className="text-white py-2 px-6 rounded-lg flex items-center">
+                <HiArrowRight />
+              </Button>
             </div>
-            <Progress
-              progress={((currentSubtopicIndex + 1) / topic.subtopics.length) * 100}
-            />
           </div>
-          <Button
-            onClick={handlePrevious}
-            className="text-white py-2 px-6 rounded-lg mb-4">
-            <HiArrowLeft />
-          </Button>
           <h1 ref={topicHeadingRef} className="text-3xl font-bold mb-4">
             Topic: {topic.name}
           </h1>
@@ -103,10 +129,35 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
               <h3 className="text-xl font-semibold">
                 {topic.subtopics[currentSubtopicIndex]?.name}
               </h3>
-              <ReactMarkdown>{topic.subtopics[currentSubtopicIndex]?.text}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                {topic.subtopics[currentSubtopicIndex]?.text}
+              </ReactMarkdown>
             </div>
           </section>
-          {isInteractive && <Interactive src={interactiveSrc} />}
+          {isInteractive && !showInteractive && (
+            <div className="flex space-x-4 mb-4">
+              <Button
+                onClick={() => handleShowInteractive('visualization')}
+                className="text-white py-2 px-6 rounded-lg">
+                Show Visualization
+              </Button>
+              <Button
+                onClick={() => handleShowInteractive('video')}
+                className="text-white py-2 px-6 rounded-lg">
+                Generate Video
+              </Button>
+              <Button
+                onClick={() => handleShowInteractive('image')}
+                className="text-white py-2 px-6 rounded-lg">
+                Generate Image
+              </Button>
+            </div>
+          )}
+          {isInteractive && showInteractive && (
+            <div ref={interactiveRef}>
+              <Interactive src={interactiveSrc} type={interactiveType} />
+            </div>
+          )}
           <div className="flex justify-end mb-4 space-x-4">
             <Button
               onClick={handleDidntUnderstand}
@@ -115,8 +166,8 @@ const SubtopicOverview: React.FC<SubtopicOverviewProps> = ({
             </Button>
             <Button
               onClick={handleNext}
-              className="cursor-pointer text-white py-2 px-6 rounded-lg">
-              Ok, next <HiArrowRight className="my-auto" />
+              className="text-white py-2 px-6 rounded-lg my-auto">
+              Ok, next <HiArrowRight className="max-width-100" />
             </Button>
           </div>
           {topic.subtopics.length > 0 && (
