@@ -20,7 +20,7 @@ export function SidebarHeader({
       {...props}
       className={clsx(
         className,
-        'flex flex-col border-b border-zinc-950/5 p-4 dark:border-white/5 [&>[data-slot=section]+[data-slot=section]]:mt-2.5'
+        'flex flex-col border-b border-zinc-950/5 p-4  [&>[data-slot=section]+[data-slot=section]]:mt-2.5'
       )}
     />
   );
@@ -50,7 +50,7 @@ export function SidebarFooter({
       {...props}
       className={clsx(
         className,
-        'flex flex-col border-t border-zinc-950/5 p-4 dark:border-white/5 [&>[data-slot=section]+[data-slot=section]]:mt-2.5'
+        'flex flex-col border-t border-zinc-950/5 p-4  [&>[data-slot=section]+[data-slot=section]]:mt-2.5'
       )}
     />
   );
@@ -80,10 +80,7 @@ export function SidebarDivider({
   return (
     <hr
       {...props}
-      className={clsx(
-        className,
-        'my-4 border-t border-zinc-950/5 lg:-mx-4 dark:border-white/5'
-      )}
+      className={clsx(className, 'my-4 border-t border-zinc-950/5 lg:-mx-4 ')}
     />
   );
 }
@@ -102,10 +99,7 @@ export function SidebarHeading({
   return (
     <h3
       {...props}
-      className={clsx(
-        className,
-        'mb-1 px-2 text-xs/6 font-medium text-zinc-500 dark:text-zinc-400'
-      )}
+      className={clsx(className, 'mb-1 px-2 text-xs/6 font-medium text-zinc-500 ')}
     />
   );
 }
@@ -138,10 +132,10 @@ export const SidebarItem = forwardRef(function SidebarItem(
     // Current
     'data-current:*:data-[slot=icon]:fill-zinc-950',
     // Dark mode
-    'dark:text-white dark:*:data-[slot=icon]:fill-zinc-400',
-    'dark:data-hover:bg-white/5 dark:data-hover:*:data-[slot=icon]:fill-white',
-    'dark:data-active:bg-white/5 dark:data-active:*:data-[slot=icon]:fill-white',
-    'dark:data-current:*:data-[slot=icon]:fill-white'
+    ' ',
+    ' ',
+    ' ',
+    ''
   );
 
   return (
@@ -149,7 +143,7 @@ export const SidebarItem = forwardRef(function SidebarItem(
       {current && (
         <motion.span
           layoutId="current-indicator"
-          className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 dark:bg-white"
+          className="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-zinc-950 "
         />
       )}
       {'href' in props ? (
